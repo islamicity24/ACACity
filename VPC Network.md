@@ -134,9 +134,8 @@ Note for Microsoft Windows users: If you don't have PuTTY installed, you must do
 
 Here is the AWS CLI command for completing the tasks described in Module 6 - Challenge Lab: Creating a VPC Networking Environment for the Café:
 
-Task 1: Creating a public subnet
+### Task 1: Creating a public subnet
 
-css
 ```
 aws ec2 create-subnet --vpc-id <Lab VPC ID> --cidr-block 10.0.0.0/24 --availability-zone <availability zone> --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=Public Subnet}]'
 ```
@@ -150,15 +149,14 @@ aws ec2 attach-internet-gateway --vpc-id <Lab VPC ID> --internet-gateway-id <int
 aws ec2 create-route --route-table-id <Lab VPC route table ID> --destination-cidr-block 0.0.0.0/0 --gateway-id <internet gateway ID>
 ```
 
-Task 2: Creating a bastion host
+### Task 2: Creating a bastion host
 
 css
 ```
 aws ec2 run-instances --image-id ami-0c55b159cbfafe1f0 --instance-type t2.micro --subnet-id <Public Subnet ID> --key-name <key pair name> --security-group-ids <Bastion Host SG ID> --associate-public-ip-address false --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Bastion Host}]'
 ```
-## Task 3: Allocating an Elastic IP address for the bastion host
+### Task 3: Allocating an Elastic IP address for the bastion host
 
-css
 ```
 aws ec2 allocate-address --domain vpc
 ```
@@ -166,7 +164,7 @@ aws ec2 allocate-address --domain vpc
 aws ec2 associate-address --instance-id <Bastion Host ID> --public-ip <Elastic IP address>
 ```
  
-Task 4: Testing the connection to the bastion host
+### Task 4: Testing the connection to the bastion host
 
 Use the downloaded SSH key to connect to the bastion host, for example:
 
