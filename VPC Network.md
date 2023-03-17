@@ -4,7 +4,7 @@ Sofía and Nikhil are now confident in their ability to create a two-tier archit
 
 Mateo
 
-When Mateo—a café regular and an AWS systems administrator and engineer—visits the café, Sofía and Nikhil tell him about the database migration. Mateo tells them that they can enhance security by running the café's application server in another private subnet that's separate from the database instance. They could then go through a bastion host (or jump box) to gain administrative access to the application server. The application server must also be able to download needed patches.
+When Mateo—a café regular and an AWS systems administrator and engineer—visits the café, Sofía and Nikhil tell him about the database migration. Mateo tells them that **they can enhance security by running the café's application server in another private subnet that's separate from the database instance**. They could then go through a bastion host (or jump box) to gain administrative access to the application server. The application server must also be able to download needed patches.
 
 Knowing that the cloud makes experimentation easier, Sofía and Nikhil are eager to set up a non-production VPC environment. They can use it implement the new architecture and test different security layers, without accidentally disrupting the café's production environment.
 
@@ -55,11 +55,11 @@ Arrange the AWS Management Console tab so that it displays along side these inst
 
 
 
-A business request for the café: Creating a VPC network that allows café staff to remotely and securely administer the web application server (Challenge #1)
+# A business request for the café: Creating a VPC network that allows café staff to remotely and securely administer the web application server (Challenge #1)
 In this challenge, you will take on the role of one of the café's system administrators. You will create and configure a VPC network so that you can securely connect from a bastion host in a public subnet to an EC2 instance in a private subnet. You will also create a NAT gateway to enable the EC2 instance in your private subnet to access the internet.  
 
 
-Task 1: Creating a public subnet
+## Task 1: Creating a public subnet
 Your first task in this lab is to create a public subnet in the Lab VPC. After you create a public subnet, you will create an internet gateway to allow communication from the subnet to the internet. You will update the routing table that's attached to the subnet to route internet-bound network traffic through the internet gateway.  
 
 Open the Amazon VPC console.
@@ -79,7 +79,7 @@ Edit the route table that was created in your VPC. Add the route 0.0.0.0/0. For 
 Hint: To successfully complete this task, you must create a few resources. If you get stuck, refer to the AWS Documentation.
 
 
-Task 2: Creating a bastion host
+## Task 2: Creating a bastion host
 In this task, you will create a bastion host in the Public Subnet. In later tasks, you will create an EC2 instance in a private subnet and connect to it from this bastion host.
 
 From the Amazon EC2 console, create an EC2 instance in the Public Subnet of the Lab VPC that meets the following criteria:
@@ -103,14 +103,14 @@ Uses the vockey key pair
 Note: In practice, hardening a bastion host involves more work than only restricting Secure Shell (SSH) traffic from your IP address. A bastion host is typically placed in a network that's closed off from other networks. It's often protected with multi-factor authentication (MFA) and monitored with auditing tools. Most enterprises require an auditable access trail to the bastion host.
 
 
-Task 3: Allocating an Elastic IP address for the bastion host
+## Task 3: Allocating an Elastic IP address for the bastion host
 In this task, you will assign an Elastic IP address to the bastion host.  
 
 The bastion host that you just created can't be reached from the internet. It doesn't have a public IPv4 address or an Elastic IP address that's associated with its private IPv4 address. Elastic IP addresses are associated with bastion instances and are allowed from on-premises firewalls. If an instance is terminated and a new instance is launched in its place, the existing Elastic IP address is re-associated with the new instance. With this behavior, the same trusted Elastic IP address is used at all times.
 
 Allocate an Elastic IP address, and make it reachable from the internet over IPv4 by associating it with your bastion host.
 
-Task 4: Testing the connection to the bastion host
+## Task 4: Testing the connection to the bastion host
 In this task, you will use the SSH key (.pem file or .ppk file) to test the SSH connection to your bastion host. This key was created for you.
 
 In the top-right area of these instructions, select Details.
@@ -132,8 +132,53 @@ Hint: If you get stuck, refer to the AWS Documentation. This page provides detai
 
 Note for Microsoft Windows users: If you don't have PuTTY installed, you must download and install PuTTY. We recommend that you configure PuTTY so that your connection doesn't expire. To keep the PuTTY session open longer, set Seconds between keepalives to 30.
 
+Here is the AWS CLI command for completing the tasks described in Module 6 - Challenge Lab: Creating a VPC Networking Environment for the Café:
 
-Task 5: Creating a private subnet
+Task 1: Creating a public subnet
+
+css
+```
+aws ec2 create-subnet --vpc-id <Lab VPC ID> --cidr-block 10.0.0.0/24 --availability-zone <availability zone> --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=Public Subnet}]'
+```
+```
+aws ec2 create-internet-gateway --tag-specifications 'ResourceType=internet-gateway,Tags=[{Key=Name,Value=Lab VPC IG}]'
+```
+```
+aws ec2 attach-internet-gateway --vpc-id <Lab VPC ID> --internet-gateway-id <internet gateway ID>
+```
+```
+aws ec2 create-route --route-table-id <Lab VPC route table ID> --destination-cidr-block 0.0.0.0/0 --gateway-id <internet gateway ID>
+```
+
+Task 2: Creating a bastion host
+
+css
+```
+aws ec2 run-instances --image-id ami-0c55b159cbfafe1f0 --instance-type t2.micro --subnet-id <Public Subnet ID> --key-name <key pair name> --security-group-ids <Bastion Host SG ID> --associate-public-ip-address false --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Bastion Host}]'
+```
+## Task 3: Allocating an Elastic IP address for the bastion host
+
+css
+```
+aws ec2 allocate-address --domain vpc
+```
+```
+aws ec2 associate-address --instance-id <Bastion Host ID> --public-ip <Elastic IP address>
+```
+ 
+Task 4: Testing the connection to the bastion host
+
+Use the downloaded SSH key to connect to the bastion host, for example:
+
+css
+```
+ssh -i labuser.pem ec2-user@<Elastic IP address>
+```
+ 
+Note: Make sure to replace the <Lab VPC ID>, <availability zone>, <internet gateway ID>, <Lab VPC route table ID>, <Public Subnet ID>, <key pair name>, <Bastion Host SG ID>, <Bastion Host ID>, and <Elastic IP address> with the actual values from your AWS account.
+ 
+
+## Task 5: Creating a private subnet
 In this task, you will create a private subnet in the Lab VPC.
 
 In the console, create a private subnet that meets the following criteria:
@@ -142,7 +187,12 @@ Name tag: Private Subnet
 Availability Zone: Same as Public Subnet
 IPv4 CIDR block: 10.0.1.0/24
 
-Task 6: Creating a NAT gateway
+```
+ aws ec2 create-subnet --vpc-id <VPC_ID> --availability-zone <AVAILABILITY_ZONE> --cidr-block 10.0.1.0/24 --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=Private Subnet}]' --no-map-public-ip-on-launch
+```
+Make sure to replace <VPC_ID> and <AVAILABILITY_ZONE> with the appropriate value
+ 
+## Task 6: Creating a NAT gateway
 In this task, you will create a NAT gateway, which enables resources in the Private Subnet to connect to the internet.
 
 Create a NAT gateway that meets the following criteria:
@@ -161,7 +211,20 @@ Attach this route table to the Private Subnet, which you created earlier.
 Hint: If you get stuck, refer to the AWS Documentation.
 
 
-Task 7: Creating an EC2 instance in the private subnet
+ # Create a new Elastic IP
+``` 
+aws ec2 allocate-address
+```
+# Create the NAT gateway
+``` 
+aws ec2 create-nat-gateway --subnet-id <SUBNET_ID> --allocation-id <ALLOCATION_ID>
+```
+# Edit the route table for the private subnet
+``` 
+aws ec2 create-route --route-table-id <ROUTE_TABLE_ID> --destination-cidr-block 0.0.0.0/0 --nat-gateway-id <NAT_GATEWAY_ID>
+```
+
+## Task 7: Creating an EC2 instance in the private subnet or Creating a security group for the EC2 instance in the private subnet
 In this task, you will create an EC2 instance in the Private Subnet, and you will configure it to allow SSH traffic from the bastion host. You will also create a new key pair to access this instance.
 
 Create a new key pair named vockey2, and download the appropriate .ppk (Microsoft Windows) or .pem (macOS or Linux).
@@ -181,8 +244,15 @@ Port: 22
 Source: Bastion host security group (Hint: Refer to the AWS Documentation
 Uses the vockey2 key pair that you created earlier
 
-
-Task 8: Configuring your SSH client for SSH passthrough
+```
+ aws ec2 create-security-group --group-name "Private Instance SG" --description "Security group for private instances" --vpc-id <VPC_ID>
+```
+# Allow incoming SSH traffic from the bastion host security group
+``` 
+aws ec2 authorize-security-group-ingress --group-id <SECURITY_GROUP_ID> --protocol tcp --port 22 --source-group <BASTION_HOST_SECURITY_GROUP_ID>
+```
+ 
+## Task 8: Configuring your SSH client for SSH passthrough
 Because the private instance you just created uses a different key pair than the bastion host, you must configure your SSH client to use SSH passthrough. This action allows you to use a key pair that's stored on your computer to access the private instance without uploading the key pair to the bastion host. This is a good security practice.  
 
 To set up your client, follow either the Microsoft Windows, or the macOS or Linux steps.
@@ -235,7 +305,7 @@ ssh user@<instance-IP-address-or-DNS-entry>
 Note:  The ssh-agent doesn't know which key it should use for a given SSH connection. Therefore, ssh-agent will sequentially try all the keys that are loaded in the agent. Because instances terminate the connection after five failed connection attempts, make sure that the agent has five or fewer keys. Because each administrator should have only a single key, this is usually not a problem for most deployments. For details about how to manage the keys in ssh-agent, use the man ssh-agent command.
 
 
-Task 9: Testing the SSH connection from the bastion host
+## Task 9: Testing the SSH connection from the bastion host
 In this task, you will test the SSH connection from your bastion host to the EC2 instance that is running in the Private Subnet.
 
 Connect to the bastion host instance by using SSH.
@@ -266,13 +336,13 @@ In this first challenge, you implemented the architectural best practice of enab
 
 Expand here to learn more about it.
 
-New business requirement: Enhancing the security layer for private resources (Challenge #2)
+# New business requirement: Enhancing the security layer for private resources (Challenge #2)
 Sofía and Nikhil are proud of the changes they made to the cafe's application architecture. They are pleased by the additional security they built, and they are also glad to have a test environment that they can use before they deploy updates to the production instance. They tell Mateo about their new application architecture, and he's impressed! To further improve their application security, Mateo advises them to build an additional layer of security by using custom network access control lists (network ACLs).
 
 In this challenge, you will continue to take on the role of one of the café's system administrators. Now that you established secure access from the bastion host to the EC2 instance in the private subnet, you must enhance the security layer of the private subnet. To accomplish this task, you will create and configure a custom network ACL.
 
 
-Task 10: Creating a network ACL
+## Task 10: Creating a network ACL
 In this task, you will create a custom network ACL to control traffic to and from the Private Subnet.
 
 You can use network ACLs to control traffic between subnets. It's a good practice to use network ACLs to implement rules that are similar to your security group rules. The network ACLs provide an additional layer of protection.
@@ -293,7 +363,7 @@ Configure your custom network ACL to allow ALL traffic that goes into and out of
 Hint: If you get stuck, refer to the AWS Documentation.
 
 
-Task 11: Testing your custom network ACL
+## Task 11: Testing your custom network ACL
 Create an EC2 instance in the Public Subnet of the Lab VPC. It should meet the following criteria.
 
 AMI: Amazon Linux 2 AMI (HVM)
@@ -329,10 +399,10 @@ In this second challenge, you protected your network resources by implementing t
 
 Expand here to learn more about it.
 
-Answering questions about the lab
+# Answering questions about the lab
 Answers will be recorded when you choose the blue Submit button at the end of the lab.
 
-Access the questions in this lab.
+44. Access the questions in this lab.
 Choose the Details 
 menu, and choose Show.
 Choose the Access the multiple choice questions link that appears at the bottom of the page.
