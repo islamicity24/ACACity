@@ -9,7 +9,7 @@ When Mateo—a café regular and an AWS systems administrator and engineer—vis
 Knowing that the cloud makes experimentation easier, Sofía and Nikhil are eager to set up a non-production VPC environment. They can use it implement the new architecture and test different security layers, without accidentally disrupting the café's production environment.
 
 
-Lab overview and objectives
+## Lab overview and objectives
 In this lab, you use Amazon Virtual Private Cloud (Amazon VPC) to create a networking environment on AWS and implement security layers to protect your resources.
 
 After completing this lab, you should be able to:
@@ -20,6 +20,9 @@ Create an additional layer of security in your VPC to control traffic to and fro
 When you start the lab, you will only have a VPC created for you in the AWS account.
 
 At the end of this lab, your architecture should look like the following example:
+
+https://github.com/islamicity24/ACACity/blob/main/module-6-challenge-lab-final-architecture.png
+![Module 6 Challenge Lab Final Architecture](https://github.com/islamicity24/ACACity/raw/main/module-6-challenge-lab-final-architecture.png)
 
 final architecture
 
