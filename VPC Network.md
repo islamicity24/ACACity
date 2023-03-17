@@ -62,7 +62,7 @@ In this challenge, you will take on the role of one of the café's system admini
 ## Task 1: Creating a public subnet
 Your first task in this lab is to create a public subnet in the Lab VPC. After you create a public subnet, you will create an internet gateway to allow communication from the subnet to the internet. You will update the routing table that's attached to the subnet to route internet-bound network traffic through the internet gateway.  
 
-Open the Amazon VPC console.
+5. Open the Amazon VPC console.
 
 Note that a VPC called Lab VPC was created for you.
 
@@ -82,7 +82,7 @@ Hint: To successfully complete this task, you must create a few resources. If yo
 ## Task 2: Creating a bastion host
 In this task, you will create a bastion host in the Public Subnet. In later tasks, you will create an EC2 instance in a private subnet and connect to it from this bastion host.
 
-From the Amazon EC2 console, create an EC2 instance in the Public Subnet of the Lab VPC that meets the following criteria:
+10. From the Amazon EC2 console, create an EC2 instance in the Public Subnet of the Lab VPC that meets the following criteria:
 
 Amazon Machine Image (AMI): Amazon Linux 2 AMI (HVM)
 
@@ -108,12 +108,12 @@ In this task, you will assign an Elastic IP address to the bastion host.
 
 The bastion host that you just created can't be reached from the internet. It doesn't have a public IPv4 address or an Elastic IP address that's associated with its private IPv4 address. Elastic IP addresses are associated with bastion instances and are allowed from on-premises firewalls. If an instance is terminated and a new instance is launched in its place, the existing Elastic IP address is re-associated with the new instance. With this behavior, the same trusted Elastic IP address is used at all times.
 
-Allocate an Elastic IP address, and make it reachable from the internet over IPv4 by associating it with your bastion host.
+11. Allocate an Elastic IP address, and make it reachable from the internet over IPv4 by associating it with your bastion host.
 
 ## Task 4: Testing the connection to the bastion host
 In this task, you will use the SSH key (.pem file or .ppk file) to test the SSH connection to your bastion host. This key was created for you.
 
-In the top-right area of these instructions, select Details.
+12. In the top-right area of these instructions, select Details.
 
 Next to AWS, choose Show.
 
@@ -179,7 +179,7 @@ Note: Make sure to replace the <Lab VPC ID>, <availability zone>, <internet gate
 ## Task 5: Creating a private subnet
 In this task, you will create a private subnet in the Lab VPC.
 
-In the console, create a private subnet that meets the following criteria:
+18. In the console, create a private subnet that meets the following criteria:
 
 Name tag: Private Subnet
 Availability Zone: Same as Public Subnet
@@ -193,7 +193,7 @@ Make sure to replace <VPC_ID> and <AVAILABILITY_ZONE> with the appropriate value
 ## Task 6: Creating a NAT gateway
 In this task, you will create a NAT gateway, which enables resources in the Private Subnet to connect to the internet.
 
-Create a NAT gateway that meets the following criteria:
+19. Create a NAT gateway that meets the following criteria:
 
 Name: Lab NAT Gateway
 Subnet: Public Subnet
@@ -225,7 +225,7 @@ aws ec2 create-route --route-table-id <ROUTE_TABLE_ID> --destination-cidr-block 
 ## Task 7: Creating an EC2 instance in the private subnet or Creating a security group for the EC2 instance in the private subnet
 In this task, you will create an EC2 instance in the Private Subnet, and you will configure it to allow SSH traffic from the bastion host. You will also create a new key pair to access this instance.
 
-Create a new key pair named vockey2, and download the appropriate .ppk (Microsoft Windows) or .pem (macOS or Linux).
+22. Create a new key pair named vockey2, and download the appropriate .ppk (Microsoft Windows) or .pem (macOS or Linux).
 
 Create an EC2 instance in the Private Subnet of the Lab VPC that meets the following criteria.
 
@@ -258,7 +258,7 @@ To set up your client, follow either the Microsoft Windows, or the macOS or Linu
 Microsoft Windows users only
 Windows users should complete the following steps.
 
-Download and install Pageant, which is available from the PuTTY download page.
+24. Download and install Pageant, which is available from the PuTTY download page.
 
 After you install Pageant, open it. Pageant runs as a Windows service.
 
@@ -306,7 +306,7 @@ Note:  The ssh-agent doesn't know which key it should use for a given SSH connec
 ## Task 9: Testing the SSH connection from the bastion host
 In this task, you will test the SSH connection from your bastion host to the EC2 instance that is running in the Private Subnet.
 
-Connect to the bastion host instance by using SSH.
+32. Connect to the bastion host instance by using SSH.
 
 Tip: Use the connection method that was described in the SSH passthrough section.
 
@@ -347,7 +347,7 @@ You can use network ACLs to control traffic between subnets. It's a good practic
 
 For this challenge, you will create an EC2 instance in the Public Subnet. You will create a security group that allows Internet Control Message Protocol (ICMP) traffic from the local network. Next, you will create and configure your custom network ACL to deny ICMP traffic between the Private Subnet and this test instance. ICMP is used by the ping utility.
 
-Go to the Amazon VPC console, and inspect the default network ACL of Lab VPC.  
+35. Go to the Amazon VPC console, and inspect the default network ACL of Lab VPC.  
 
 Note 1: The subnets that you created are automatically associated with the default network ACL.
 Note 2: The inbound and outbound rules of the default network ACL allow all traffic.
@@ -362,7 +362,8 @@ Hint: If you get stuck, refer to the AWS Documentation.
 
 
 ## Task 11: Testing your custom network ACL
-Create an EC2 instance in the Public Subnet of the Lab VPC. It should meet the following criteria.
+
+38. Create an EC2 instance in the Public Subnet of the Lab VPC. It should meet the following criteria.
 
 AMI: Amazon Linux 2 AMI (HVM)
 Instance type: t2.micro
@@ -371,8 +372,9 @@ Allows All ICMP – IPv4 inbound traffic to the instance through the security gr
 Note the private IP address of the Test Instance.
 
 Test that you can reach the private IP address of the Test Instance from the Private Instance. From the Private Instance terminal window, run the following ping command:
-
+```
 ping <private-ip-address-of-test-instance>
+``` 
 Leave the ping utility running.
 
 Modify your custom network ACL to deny All ICMP – IPv4 traffic to the <private-ip-address-of-test-instance>/32
